@@ -1,0 +1,92 @@
+.badge-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.badge {
+  position: relative;
+  width: 180px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  color: #ffffff;
+  transition: background 0.3s ease-in-out;
+}
+
+.badge.locked {
+  color: #a0aec0; 
+  background: #e2e8f0; 
+}
+
+/* Shimmer Effect for Unlocked Badges */
+.badge.unlocked::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: skewX(-45deg);
+  animation: shimmer 4s infinite;
+}
+
+/* Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    left: -80%;
+    background: rgba(255, 255, 255, 0.3); 
+  }
+  50% {
+    left: 108%;
+    background: rgba(255, 255, 255, 0.6);
+  }
+  90% {
+    left: 108%;
+    background: rgba(255, 255, 255, 0.6); 
+  }
+  100% {
+    left: -80%; /* Reset back to the left side */
+    background: rgba(255, 255, 255, 0.3); /* Smooth transition to original color */
+  }
+}
+
+.badge-text {
+  z-index: 1;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.popup-overlay.stats {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-content.stats  {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+}
+

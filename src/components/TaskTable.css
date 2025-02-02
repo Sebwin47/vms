@@ -1,0 +1,24 @@
+.table-striped tbody td {
+    color: black !important; /* Textfarbe auf schwarz setzen */
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+.filter-container {
+    width: 100%;
+    max-width: 600px;
+}
+
+@media (max-width: 768px) {
+.filter-container {
+    padding: 0 15px;
+}
+
+.table {
+    font-size: 14px;
+}
+}
+
