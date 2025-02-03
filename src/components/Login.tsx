@@ -40,7 +40,7 @@ function Login() {
   };
 
   return (
-    <form className="login">
+    <div className="login">
       <MDBContainer fluid>
         <MDBRow className="d-flex h-100">
           <MDBCol col="12">
@@ -48,10 +48,7 @@ function Login() {
               className="bg-dark text-white my-5 mx-auto"
               style={{ borderRadius: "1rem", maxWidth: "400px" }}
             >
-              <MDBCardBody
-                className="p-5 d-flex flex-column align-items-center mx-auto w-100"
-                onSubmit={handleLogin}
-              >
+              <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
                 <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
                 <p className="text-white-50 mb-4">
                   Please enter your login and password!
@@ -86,7 +83,6 @@ function Login() {
                   color="white"
                   size="lg"
                   onClick={handleLogin}
-                  type="submit"
                 >
                   Login
                 </MDBBtn>
@@ -108,7 +104,7 @@ function Login() {
           </MDBCol>
         </MDBRow>
       </MDBContainer>
-    </form>
+    </div>
   );
 }
 
