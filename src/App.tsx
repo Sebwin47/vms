@@ -23,7 +23,7 @@ function isTokenValid() {
   if (!token) return false;
 
   try {
-    const decoded = jwtDecode(token);
+    const decoded: any = jwtDecode(token);
     const now = Date.now() / 1000;
     return decoded.exp > now;
   } catch (error) {
@@ -31,7 +31,7 @@ function isTokenValid() {
   }
 }
 
-function PrivateRoute({ children }) {
+function PrivateRoute({ children }: { children: React.ReactNode }) {
   const isAuthenticated = isTokenValid();
 
   if (!isAuthenticated) {
@@ -101,7 +101,7 @@ function App() {
   );
 }
 
-function PageLayout({ content }) {
+function PageLayout({ content }: { content: React.ReactNode }) {
   const navigate = useNavigate();
 
   return (

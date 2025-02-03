@@ -36,22 +36,24 @@ function Login() {
       }
     } catch (error) {
       console.error("Error during login:", error);
-      alert("An error occurred during login. Please try again.");
     }
   };
 
   return (
-    <div className="login">
+    <form className="login">
       <MDBContainer fluid>
-        <MDBRow className="d-flex justify-content-center align-items-center h-100">
+        <MDBRow className="d-flex h-100">
           <MDBCol col="12">
             <MDBCard
               className="bg-dark text-white my-5 mx-auto"
               style={{ borderRadius: "1rem", maxWidth: "400px" }}
             >
-              <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
+              <MDBCardBody
+                className="p-5 d-flex flex-column align-items-center mx-auto w-100"
+                onSubmit={handleLogin}
+              >
                 <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
-                <p className="text-white-50 mb-5">
+                <p className="text-white-50 mb-4">
                   Please enter your login and password!
                 </p>
 
@@ -84,6 +86,7 @@ function Login() {
                   color="white"
                   size="lg"
                   onClick={handleLogin}
+                  type="submit"
                 >
                   Login
                 </MDBBtn>
@@ -105,7 +108,7 @@ function Login() {
           </MDBCol>
         </MDBRow>
       </MDBContainer>
-    </div>
+    </form>
   );
 }
 

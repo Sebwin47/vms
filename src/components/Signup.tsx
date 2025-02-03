@@ -31,16 +31,16 @@ function SignUp() {
     { text: "Prefer not to say", value: "Non" },
   ];
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleGenderChange = (selectedGender) => {
+  const handleGenderChange = (selectedGender: string) => {
     setFormData({ ...formData, gender: selectedGender });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -74,7 +74,7 @@ function SignUp() {
               style={{ borderRadius: "1rem", maxWidth: "600px" }}
             >
               <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
-                <h2 className="fw-bold mb-4 text-uppercase">Sign Up</h2>
+                <h2 className="fw-bold mb-2 text-uppercase">Sign Up</h2>
                 <p className="text-white-50 mb-4">Create your account!</p>
 
                 <form onSubmit={handleSubmit} style={{ width: "100%" }}>

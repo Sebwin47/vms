@@ -52,7 +52,7 @@ function Profile() {
       };
 
       setFormData(profileData);
-    } catch (err) {
+    } catch (err: any) {
       setError(
         "Error loading profile: " + (err.response?.data?.message || err.message)
       );
@@ -152,7 +152,7 @@ function Profile() {
 
       alert("Profile updated successfully!");
       setIsEditing(false);
-    } catch (err) {
+    } catch (err : any) {
       alert(
         "Error saving profile: " + (err.response?.data?.message || err.message)
       );
