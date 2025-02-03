@@ -25,18 +25,17 @@ const Admin: React.FC = () => {
     }
   };
 
-  const [expandedVolunteers, setExpandedVolunteers] = useState<Set<number>>(
+  const [expandedVolunteers, setExpandedVolunteers] = useState<Set<string>>(
     new Set()
   );
 
-  const toggleSkillDetails = (volunteerId: number) => {
-    const newSet = new Set(expandedVolunteers);
-    if (newSet.has(volunteerId)) {
-      newSet.delete(volunteerId);
-    } else {
-      newSet.add(volunteerId);
-    }
-    setExpandedVolunteers(newSet);
+  const toggleSkillDetails = (taskId: string, volunteerId: number) => {
+    setExpandedVolunteers((prev) => {
+      const key = `${taskId}-${volunteerId}`;
+      const newSet = new Set(prev);
+      newSet.has(key) ? newSet.delete(key) : newSet.add(key);
+      return newSet;
+    });
   };
 
   const assignVolunteerToTask = async (vid: string, tid: string) => {
@@ -239,7 +238,10 @@ const Admin: React.FC = () => {
                                   <button
                                     className={`btn btn-sm ms-2 ${volunteer.bestMatchType}`}
                                     onClick={() =>
-                                      toggleSkillDetails(volunteer.id)
+                                      toggleSkillDetails(
+                                        result.taskId,
+                                        volunteer.id
+                                      )
                                     }
                                   >
                                     {volunteer.bestMatchType}
@@ -257,14 +259,20 @@ const Admin: React.FC = () => {
                                     </span>
                                   )}
                                   <div className="skill-chips mt-2">
-                                    {volunteer.matchedSkills
-                                      .filter(() =>
-                                        expandedVolunteers.has(volunteer.id)
-                                      )
-                                      .map((skill: any, index: number) => (
+                                    {expandedVolunteers.has(
+                                      `${result.taskId}-${volunteer.id}`
+                                    ) &&
+                                      // Deduplizierung der Skills
+                                      Array.from(
+                                        new Map(
+                                          volunteer.matchedSkills.map(
+                                            (skill: any) => [skill.skill, skill]
+                                          )
+                                        ).values()
+                                      ).map((skill: any) => (
                                         <div
-                                          key={index}
-                                          className={`skill-chip ${skill.type} `}
+                                          key={`${volunteer.id}-${skill.skill}`} // Key ohne Task-ID
+                                          className={`skill-chip ${skill.type}`}
                                         >
                                           {skill.skill}
                                           <span className="skill-type-badge">

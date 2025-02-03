@@ -22,6 +22,7 @@ const TaskCreation: React.FC = () => {
     priority: "Medium",
     remarks: "",
     neededPersons: 1,
+    tolerance: 0,
     categoryId: "",
   });
   const [locationData, setLocationData] = useState({
@@ -84,6 +85,7 @@ const TaskCreation: React.FC = () => {
         priority: "Medium",
         remarks: "",
         neededPersons: 1,
+        tolerance: 0,
         categoryId: "",
       });
       setEnteredSkills([]); // Skills zurücksetzen
@@ -199,7 +201,7 @@ const TaskCreation: React.FC = () => {
           </div>
 
           <div className="row">
-            <div className="col-md-4">
+            <div className="col-md-3">
               <div className="form-group">
                 <label>Status</label>
                 <select
@@ -215,7 +217,7 @@ const TaskCreation: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <div className="form-group">
                 <label>Priority</label>
                 <select
@@ -231,7 +233,7 @@ const TaskCreation: React.FC = () => {
                 </select>
               </div>
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <div className="form-group">
                 <label>People Needed</label>
                 <input
@@ -243,6 +245,24 @@ const TaskCreation: React.FC = () => {
                     setFormData({
                       ...formData,
                       neededPersons: Number(e.target.value),
+                    })
+                  }
+                  required
+                />
+              </div>
+            </div>
+            <div className="col-md-3">
+              <div className="form-group">
+                <label>Tolerance</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  value={formData.tolerance}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      tolerance: Number(e.target.value),
                     })
                   }
                   required
