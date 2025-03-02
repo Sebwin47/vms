@@ -110,17 +110,17 @@ function SignUp() {
                   <MDBRow className="mb-4">
                     <MDBCol md="6">
                       <MDBInput
-                        label="Email Address"
-                        name="email"
-                        type="email"
+                        label="Phone Number"
+                        name="telephone"
+                        type="tel"
                         size="lg"
-                        value={formData.email}
+                        value={formData.telephone}
                         onChange={handleChange}
                         labelClass="text-white"
                         style={{ color: "white" }}
-                        required
                       />
                     </MDBCol>
+
                     <MDBCol md="6">
                       <select
                         className="form-select form-select-lg"
@@ -141,14 +141,15 @@ function SignUp() {
                   <MDBRow className="mb-4">
                     <MDBCol md="6">
                       <MDBInput
-                        label="Phone Number"
-                        name="telephone"
-                        type="tel"
+                        label="Email Address"
+                        name="email"
+                        type="email"
                         size="lg"
-                        value={formData.telephone}
+                        value={formData.email}
                         onChange={handleChange}
                         labelClass="text-white"
                         style={{ color: "white" }}
+                        required
                       />
                     </MDBCol>
                     <MDBCol md="6">

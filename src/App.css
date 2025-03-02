@@ -247,3 +247,8 @@ html, body {
 .btn.group { background-color: #c93f3f; color : #fff; }
 .btn.narrower { background-color: #9056fb; color : #fff; }
 .btn.broader { background-color: #ffc107; color: #000000; }
+
+.thick-divider {
+  border-top: 2px solid rgba(0, 0, 0, 0.2) !important;
+  margin: 8px 0;
+}

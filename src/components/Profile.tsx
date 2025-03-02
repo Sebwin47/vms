@@ -33,10 +33,11 @@ function Profile() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [newLocation, setNewLocation] = useState("");
   const [enteredSkills, setEnteredSkills] = useState<string[]>([]);
   const [skillsInput, setSkillsInput] = useState("");
   const [skillSuggestions, setSkillSuggestions] = useState<string[]>([]);
+  const [enteredLocalities, setEnteredLocalities] = useState<string[]>([]);
+  const [localityInput, setLocalityInput] = useState<string>("");
 
   const fetchProfile = async () => {
     const token = localStorage.getItem("authToken");
@@ -47,11 +48,13 @@ function Profile() {
 
       const profileData = {
         ...response.data.user,
-        availability: response.data.user.availability || "[]",
-        locationAvailability: response.data.user.locationAvailability || "[]",
+        availability: response.data.user.availability || [],
+        locationAvailability: response.data.user.locationAvailability || [],
       };
 
       setFormData(profileData);
+      // Initialize enteredLocalities with fetched data
+      setEnteredLocalities(profileData.locationAvailability || []);
     } catch (err: any) {
       setError(
         "Error loading profile: " + (err.response?.data?.message || err.message)
@@ -113,26 +116,32 @@ function Profile() {
     }));
   };
 
-  const handleLocationAdd = () => {
-    if (newLocation.trim()) {
-      setFormData((prev) => ({
-        ...prev,
-        locationAvailability: [
-          ...prev.locationAvailability,
-          newLocation.trim(),
-        ],
-      }));
-      setNewLocation("");
+  const handleLocalityInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocalityInput(e.target.value);
+  };
+
+  const handleLocalityAdd = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && localityInput.trim() !== "") {
+      const newLocality = localityInput.trim();
+
+      if (!enteredLocalities.includes(newLocality)) {
+        setEnteredLocalities([...enteredLocalities, newLocality]);
+        setLocalityInput("");
+      }
     }
   };
 
+  const handleLocationAdd = () => {
+    if (localityInput.trim()) {
+      const newLocality = localityInput.trim();
+      if (!enteredLocalities.includes(newLocality)) {
+        setEnteredLocalities([...enteredLocalities, newLocality]);
+        setLocalityInput("");
+      }
+    }
+  };
   const handleLocationRemove = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      locationAvailability: prev.locationAvailability.filter(
-        (_, i) => i !== index
-      ),
-    }));
+    setEnteredLocalities(enteredLocalities.filter((_, i) => i !== index));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -143,7 +152,7 @@ function Profile() {
         ...formData,
         skills: enteredSkills,
         availability: formData.availability,
-        locationAvailability: formData.locationAvailability,
+        locationAvailability: enteredLocalities,
       };
 
       await axios.put(`${API_BASE_URL}/profile`, dataToSend, {
@@ -152,7 +161,7 @@ function Profile() {
 
       alert("Profile updated successfully!");
       setIsEditing(false);
-    } catch (err : any) {
+    } catch (err: any) {
       alert(
         "Error saving profile: " + (err.response?.data?.message || err.message)
       );
@@ -324,9 +333,11 @@ function Profile() {
             </div>
           ))}
           {isEditing && (
-            <Button variant="outline-primary" onClick={addAvailabilitySlot}>
-              Add Time Slot
-            </Button>
+            <div>
+              <Button variant="outline-primary" onClick={addAvailabilitySlot}>
+                Add Time Slot
+              </Button>
+            </div>
           )}
         </Form.Group>
 
@@ -379,7 +390,7 @@ function Profile() {
         <Form.Group className="mb-4">
           <Form.Label>Location Availability</Form.Label>
           <div className="locality-chips">
-            {formData.locationAvailability.map((locality, index) => (
+            {enteredLocalities.map((locality, index) => (
               <div key={index} className="locality-chip">
                 {locality}
                 {isEditing && (
@@ -397,8 +408,9 @@ function Profile() {
             <div className="d-flex gap-2 mt-2">
               <Form.Control
                 type="text"
-                value={newLocation}
-                onChange={(e) => setNewLocation(e.target.value)}
+                value={localityInput}
+                onChange={handleLocalityInput}
+                onKeyDown={handleLocalityAdd}
                 placeholder="Add new location"
               />
               <Button variant="primary" onClick={handleLocationAdd}>

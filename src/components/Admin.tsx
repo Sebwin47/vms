@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Admin.css";
 import API_BASE_URL from "./config";
 import { ProgressBar } from "react-bootstrap";
 import TaskCreation from "./TaskCreation";
+import { debounce } from "lodash";
 
 const Admin: React.FC = () => {
   const [taskFilter, setTaskFilter] = useState<string>("");
@@ -13,6 +14,8 @@ const Admin: React.FC = () => {
   const [expandedTask, setExpandedTask] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"create" | "find">("find");
   const [matchType, setMatchType] = useState<"exact" | "related">("exact");
+  const [showTaskSuggestions, setShowTaskSuggestions] = useState(false);
+  const [taskSuggestions, setTaskSuggestions] = useState<string[]>([]);
 
   const executeQuery = async () => {
     try {
@@ -59,6 +62,23 @@ const Admin: React.FC = () => {
     setExpandedTask(expandedTask === taskId ? null : taskId);
   };
 
+  useEffect(() => {
+    const fetchTaskSuggestions = debounce(async (query: string) => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/task-suggestions`, {
+          params: { query },
+        });
+        setTaskSuggestions(response.data.tasks);
+      } catch (error) {
+        console.error("Error fetching task suggestions:", error);
+      }
+    }, 300);
+
+    if (taskFilter.length > 0 || showTaskSuggestions) {
+      fetchTaskSuggestions(taskFilter);
+    }
+  }, [taskFilter, showTaskSuggestions]);
+
   return (
     <div className="p-4 d-flex flex-column center align-items-center">
       <div className="w-75 mb-4">
@@ -87,15 +107,41 @@ const Admin: React.FC = () => {
             </div>
           ) : (
             <div className="tab-pane fade show active">
-              <div className="mb-4 w-100">
+              <div className="mb-4 w-100 position-relative">
                 <label className="form-label">Task Name</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Filter by Task Name"
+                  placeholder="Start typing or click for suggestions"
                   value={taskFilter}
                   onChange={(e) => setTaskFilter(e.target.value)}
+                  onFocus={() => setShowTaskSuggestions(true)}
+                  onBlur={() =>
+                    setTimeout(() => setShowTaskSuggestions(false), 200)
+                  }
                 />
+
+                {showTaskSuggestions && (
+                  <div className="suggestions-dropdown shadow-sm">
+                    <div className="suggestions-container">
+                      <div className="suggestions-list">
+                        {taskSuggestions.map((task, index) => (
+                          <button
+                            key={index}
+                            type="button"
+                            className="suggestion-item"
+                            onClick={() => {
+                              setTaskFilter(task);
+                              setShowTaskSuggestions(false);
+                            }}
+                          >
+                            {task}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="mb-4 d-flex align-items-center gap-3">

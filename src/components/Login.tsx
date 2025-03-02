@@ -30,12 +30,18 @@ function Login() {
       if (response.ok) {
         localStorage.setItem("authToken", result.token);
         alert("Login successful!");
-        navigate("/tasks");
+
+        if (result.user.role === "coordinator") {
+          navigate("/admin");
+        } else {
+          navigate("/tasks");
+        }
       } else {
         alert(`Login failed: ${result.message}`);
       }
     } catch (error) {
       console.error("Error during login:", error);
+      alert("An error occurred during login");
     }
   };
 

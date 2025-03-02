@@ -2,12 +2,14 @@ import TaskTable from "./components/TaskTable";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
 import "./App.css";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
   useNavigate,
+  useLocation,
 } from "react-router-dom";
 import { Navbar, Nav, Dropdown, Container } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
@@ -18,24 +20,42 @@ import { jwtDecode } from "jwt-decode";
 import Statistics from "./components/Stats";
 import CheckInOut from "./components/CheckInOut";
 
-function isTokenValid() {
+function getAuthInfo() {
   const token = localStorage.getItem("authToken");
-  if (!token) return false;
+  if (!token) return { isValid: false, role: null };
 
   try {
     const decoded: any = jwtDecode(token);
     const now = Date.now() / 1000;
-    return decoded.exp > now;
+    return {
+      isValid: decoded.exp > now,
+      role: decoded.role,
+      email: decoded.email,
+    };
   } catch (error) {
-    return false;
+    return { isValid: false, role: null };
   }
 }
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = isTokenValid();
+function PrivateRoute({
+  children,
+  requiredRole,
+}: {
+  children: React.ReactNode;
+  requiredRole?: string;
+}) {
+  const { isValid, role } = getAuthInfo();
 
-  if (!isAuthenticated) {
+  if (!isValid) {
     return <Navigate to="/login" />;
+  }
+
+  if (requiredRole == "volunteer" && role !== "volunteer") {
+    return <Navigate to="/admin" />;
+  }
+
+  if (requiredRole == "coordinator" && role !== "coordinator") {
+    return <Navigate to="/tasks" />;
   }
 
   return children;
@@ -61,17 +81,8 @@ function App() {
         <Route
           path="/stats"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="volunteer">
               <PageLayout content={<Statistics />} />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/admin"
-          element={
-            <PrivateRoute>
-              <PageLayout content={<Admin />} />
             </PrivateRoute>
           }
         />
@@ -79,7 +90,7 @@ function App() {
         <Route
           path="/profile"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="volunteer">
               <PageLayout content={<Profile />} />
             </PrivateRoute>
           }
@@ -88,8 +99,17 @@ function App() {
         <Route
           path="/checkinout"
           element={
-            <PrivateRoute>
+            <PrivateRoute requiredRole="volunteer">
               <PageLayout content={<CheckInOut />} />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute requiredRole="coordinator">
+              <PageLayout content={<Admin />} />
             </PrivateRoute>
           }
         />
@@ -137,6 +157,20 @@ function PageLayout({ content }: { content: React.ReactNode }) {
 
 function ProfileDropdown() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const token = localStorage.getItem("authToken");
+  const [userRole, setUserRole] = useState("volunteer");
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        setUserRole(decoded.role);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, [token]);
 
   return (
     <Dropdown align="end">
@@ -148,23 +182,38 @@ function ProfileDropdown() {
         <FaUserCircle size={32} color="white" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item onClick={() => navigate("/profile")}>
-          Manage Profile
-        </Dropdown.Item>
-        <Dropdown.Item onClick={() => navigate("/stats")}>
-          Statistics
-        </Dropdown.Item>
-        <Dropdown.Item onClick={() => navigate("/checkinout")}>
-          CheckInOut
-        </Dropdown.Item>
-        <Dropdown.Divider />
-        <Dropdown.Item onClick={() => navigate("/admin")}>
-          Admin Panel
-        </Dropdown.Item>
+        {userRole === "volunteer" && (
+          <>
+            <Dropdown.Item onClick={() => navigate("/profile")}>
+              Manage Profile
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/stats")}>
+              Statistics
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/checkinout")}>
+              Check In/Out
+            </Dropdown.Item>
+          </>
+        )}
+
+        {userRole === "coordinator" ? (
+          location.pathname === "/admin" ? (
+            <Dropdown.Item onClick={() => navigate("/tasks")}>
+              User Panel
+            </Dropdown.Item>
+          ) : (
+            <Dropdown.Item onClick={() => navigate("/admin")}>
+              Admin Panel
+            </Dropdown.Item>
+          )
+        ) : (
+          <Dropdown.Divider className="thick-divider" />
+        )}
+
         <Dropdown.Item
           onClick={() => {
-            localStorage.removeItem("authToken"); // Clear the token
-            navigate("/login"); // Redirect to login page
+            localStorage.removeItem("authToken");
+            navigate("/login");
           }}
         >
           Logout
