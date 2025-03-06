@@ -23,16 +23,40 @@ const TaskTable: React.FC = () => {
   const [skillsInput, setSkillsInput] = useState<string>("");
   const [placeDetails, setPlaceDetails] = useState<any | null>(null);
   const [showPlacePopup, setShowPlacePopup] = useState<boolean>(false);
+  const [assignAsGroup, setAssignAsGroup] = useState(false);
   const [userRole, setUserRole] = useState<"volunteer" | "coordinator">(
     "volunteer"
   );
+  const [isLeader, setIsLeader] = useState(false);
+  const [groupSize, setGroupSize] = useState(0);
+
+  const checkLeadership = async () => {
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await axios.get(`${API_BASE_URL}/check-leader`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setIsLeader(response.data.isLeader);
+
+      if (response.data.isLeader) {
+        setGroupSize(response.data.groupSize);
+      }
+    } catch (error) {
+      console.error("Error checking leadership:", error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        setUserRole(decoded.role || "volunteer");
+        setUserRole(
+          decoded.role === "coordinator" ? "coordinator" : "volunteer"
+        );
+        if (userRole !== "coordinator") {
+          checkLeadership();
+        }
       } catch (error) {
         console.error("Error decoding token:", error);
       }
@@ -239,50 +263,77 @@ const TaskTable: React.FC = () => {
   const assignToTask = async (tid: string) => {
     try {
       const token = localStorage.getItem("authToken");
+      const endpoint = assignAsGroup
+        ? `${API_BASE_URL}/assign-group`
+        : `${API_BASE_URL}/assign-volunteer`;
+
       const response = await axios.post(
-        `${API_BASE_URL}/assign-volunteer`,
+        endpoint,
         { tid },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.status === 200) {
-        fetchTasks();
-      }
+      if (response.status === 200) fetchTasks();
     } catch (error) {
-      console.error("Error assigning volunteer to task:", error);
-      alert("Error assigning volunteer to task");
+      console.error("Error assigning to task:", error);
     }
   };
 
-  const removeVolunteerFromTask = async (tid: string) => {
+  const removeFromTask = async (tid: string) => {
     try {
       const token = localStorage.getItem("authToken");
+      const endpoint = assignAsGroup
+        ? `${API_BASE_URL}/remove-group`
+        : `${API_BASE_URL}/remove-volunteer`;
+
       const response = await axios.post(
-        `${API_BASE_URL}/remove-volunteer`,
+        endpoint,
         { tid },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      if (response.status === 200) {
-        fetchTasks();
-      }
+      if (response.status === 200) fetchTasks();
     } catch (error) {
-      console.error("Error removing volunteer from task:", error);
-      alert("Error removing volunteer from task");
+      console.error("Error removing from task:", error);
     }
   };
 
   return (
     <div className="p-4 d-flex flex-column align-items-center">
-      <div className="mb-2">
+      <div className="mb-3">
+        {isLeader && (
+          <div className="d-flex justify-content-center">
+            <div
+              className="btn-group"
+              role="group"
+              aria-label="Assignment switch"
+            >
+              <button
+                type="button"
+                className={`btn ${
+                  !assignAsGroup ? "btn-primary" : "btn-outline-primary"
+                }`}
+                onClick={() => setAssignAsGroup(false)}
+                style={{
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                }}
+              >
+                Assign Self
+              </button>
+              <button
+                type="button"
+                className={`btn ${
+                  assignAsGroup ? "btn-primary" : "btn-outline-primary"
+                }`}
+                onClick={() => setAssignAsGroup(true)}
+                style={{ borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+              >
+                Assign Group
+              </button>
+            </div>
+          </div>
+        )}
         <div className="row gy-2">
           <div className="col-12">
             <label className="form-label mb-0">Start Date</label>
@@ -495,7 +546,7 @@ const TaskTable: React.FC = () => {
                       <button
                         disabled={
                           task.status === "Completed" ||
-                          task.isGroupAssigned ||
+                          (assignAsGroup ? false : task.isGroupAssigned) ||
                           userRole === "coordinator"
                         }
                         className={
@@ -503,7 +554,7 @@ const TaskTable: React.FC = () => {
                             ? "btn btn-secondary"
                             : "btn btn-danger"
                         }
-                        onClick={() => removeVolunteerFromTask(task.tid)}
+                        onClick={() => removeFromTask(task.tid)}
                       >
                         Remove
                       </button>
@@ -511,7 +562,12 @@ const TaskTable: React.FC = () => {
                       <button
                         disabled={
                           task.status === "Completed" ||
-                          task.missingAssignments + task.tolerance <= 0 ||
+                          (assignAsGroup
+                            ? task.missingAssignments +
+                                task.tolerance -
+                                (groupSize - 1) <=
+                              0
+                            : task.missingAssignments + task.tolerance <= 0) ||
                           userRole === "coordinator"
                         }
                         className={
