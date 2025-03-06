@@ -3,6 +3,7 @@ import axios from "axios";
 import "./TaskTable.css";
 import { FaFilter, FaUndo } from "react-icons/fa";
 import { ProgressBar } from "react-bootstrap";
+import { jwtDecode } from "jwt-decode";
 
 import API_BASE_URL from "./config";
 
@@ -22,6 +23,21 @@ const TaskTable: React.FC = () => {
   const [skillsInput, setSkillsInput] = useState<string>("");
   const [placeDetails, setPlaceDetails] = useState<any | null>(null);
   const [showPlacePopup, setShowPlacePopup] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<"volunteer" | "coordinator">(
+    "volunteer"
+  );
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        setUserRole(decoded.role || "volunteer");
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -268,7 +284,6 @@ const TaskTable: React.FC = () => {
     <div className="p-4 d-flex flex-column align-items-center">
       <div className="mb-2">
         <div className="row gy-2">
-          {/* Start Date Row */}
           <div className="col-12">
             <label className="form-label mb-0">Start Date</label>
             <input
@@ -280,7 +295,6 @@ const TaskTable: React.FC = () => {
             />
           </div>
 
-          {/* End Date Row */}
           <div className="col-12">
             <label className="form-label mb-0">End Date</label>
             <input
@@ -292,7 +306,6 @@ const TaskTable: React.FC = () => {
             />
           </div>
 
-          {/* Buttons Row */}
           <div className="col-12 d-flex gap-2">
             <button
               type="button"
@@ -481,7 +494,9 @@ const TaskTable: React.FC = () => {
                     {task.isAssigned ? (
                       <button
                         disabled={
-                          task.status === "Completed" || task.isGroupAssigned
+                          task.status === "Completed" ||
+                          task.isGroupAssigned ||
+                          userRole === "coordinator"
                         }
                         className={
                           task.status === "Completed"
@@ -496,7 +511,8 @@ const TaskTable: React.FC = () => {
                       <button
                         disabled={
                           task.status === "Completed" ||
-                          task.missingAssignments + task.tolerance <= 0
+                          task.missingAssignments + task.tolerance <= 0 ||
+                          userRole === "coordinator"
                         }
                         className={
                           task.status === "Completed"
@@ -525,12 +541,10 @@ const TaskTable: React.FC = () => {
       {showPlacePopup && placeDetails && (
         <div className="popup-overlay fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="popup-content bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
-            {/* Popup Header */}
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">
               Place Details
             </h2>
 
-            {/* Address Details */}
             <div className="text-sm text-gray-700 space-y-2">
               <p>
                 <strong className="text-gray-900">Street Address:</strong>{" "}
@@ -562,7 +576,6 @@ const TaskTable: React.FC = () => {
               </p>
             </div>
 
-            {/* Close Button */}
             <button
               className="mt-6 w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               onClick={() => setShowPlacePopup(false)}

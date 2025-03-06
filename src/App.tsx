@@ -114,7 +114,7 @@ function App() {
           }
         />
 
-        {/* Fallback: Leite auf die Login-Seite um */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
@@ -126,7 +126,7 @@ function PageLayout({ content }: { content: React.ReactNode }) {
 
   return (
     <div className="App d-flex flex-column min-vh-100">
-      {/* Kopfzeile */}
+      {/* Header */}
       <header className="bg-dark py-1">
         <Navbar expand="lg" className="bg-dark general text-white">
           <Container>
@@ -144,7 +144,7 @@ function PageLayout({ content }: { content: React.ReactNode }) {
         </Navbar>
       </header>
 
-      {/* Hauptinhalt */}
+      {/* Main */}
       <main className="container mt-4 flex-grow-1">{content}</main>
 
       {/* Footer */}

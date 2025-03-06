@@ -29,7 +29,6 @@
   background: #e2e8f0; 
 }
 
-/* Shimmer Effect for Unlocked Badges */
 .badge.unlocked::before {
   content: "";
   position: absolute;
@@ -42,7 +41,6 @@
   animation: shimmer 4s infinite;
 }
 
-/* Shimmer Animation */
 @keyframes shimmer {
   0% {
     left: -80%;
@@ -57,8 +55,8 @@
     background: rgba(255, 255, 255, 0.6); 
   }
   100% {
-    left: -80%; /* Reset back to the left side */
-    background: rgba(255, 255, 255, 0.3); /* Smooth transition to original color */
+    left: -80%;
+    background: rgba(255, 255, 255, 0.3);
   }
 }
 

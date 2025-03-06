@@ -22,7 +22,25 @@ const CheckInOut: React.FC = () => {
   const [manualStartTime, setManualStartTime] = useState("");
   const [manualEndTime, setManualEndTime] = useState("");
 
+
   useEffect(() => {
+    // Restore timer state from local storage
+    const savedTimer = localStorage.getItem("timerState");
+    if (savedTimer) {
+      const { isTimerRunning, startTime, selectedTaskId } =
+        JSON.parse(savedTimer);
+      if (isTimerRunning && startTime) {
+        const parsedStartTime = new Date(startTime);
+        const now = new Date();
+        const elapsed = now.getTime() - parsedStartTime.getTime();
+        setStartTime(parsedStartTime);
+        setElapsedTime(elapsed);
+        setIsTimerRunning(true);
+        setSelectedTaskId(selectedTaskId);
+      }
+    }
+
+    // Fetch assigned tasks
     const fetchAssignedTasks = async () => {
       try {
         const token = localStorage.getItem("authToken");
@@ -46,6 +64,21 @@ const CheckInOut: React.FC = () => {
     fetchAssignedTasks();
   }, []);
 
+  // Save timer state to local storage
+  useEffect(() => {
+    if (isTimerRunning) {
+      const timerState = {
+        isTimerRunning,
+        startTime: startTime?.toISOString(),
+        selectedTaskId,
+      };
+      localStorage.setItem("timerState", JSON.stringify(timerState));
+    } else {
+      localStorage.removeItem("timerState");
+    }
+  }, [isTimerRunning, startTime, selectedTaskId]);
+
+  // Update elapsed time 
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isTimerRunning && startTime) {
@@ -99,6 +132,7 @@ const CheckInOut: React.FC = () => {
           }"`
         );
         setTimeout(() => setMessage(""), 5000);
+        localStorage.removeItem("timerState"); 
       } catch (err) {
         console.error("Error logging work:", err);
         setError("Failed to log work time");
@@ -124,7 +158,7 @@ const CheckInOut: React.FC = () => {
       return;
     }
 
-    const duration = (end.getTime() - start.getTime()) / 3600000; // hours
+    const duration = (end.getTime() - start.getTime()) / 3600000; 
 
     try {
       await axios.post(
@@ -196,7 +230,6 @@ const CheckInOut: React.FC = () => {
         </select>
       </div>
 
-      {/* Mode toggle */}
       <div className="checkinout-mode-toggle">
         <button
           className={`checkinout-mode-btn ${

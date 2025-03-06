@@ -16,14 +16,14 @@ import {
 const Statistics: React.FC = () => {
   const [userHours, setUserHours] = useState<number>(0);
   const [personalGoal, setPersonalGoal] = useState<number>(30); // Default goal
-  const [isEditingGoal, setIsEditingGoal] = useState(false); // Edit mode state
+  const [isEditingGoal, setIsEditingGoal] = useState(false); 
   const [groupLeaderboard, setGroupLeaderboard] = useState<any[]>([]);
   const [volunteerLeaderboard, setVolunteerLeaderboard] = useState<any[]>([]);
   const [streakLeaderboard, setStreakLeaderboard] = useState<any[]>([]);
   const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
   const [loadingVolunteers, setLoadingVolunteers] = useState<boolean>(true);
-  const [popupMessage, setPopupMessage] = useState(""); // To store popup message
-  const [showPopup, setShowPopup] = useState(false); // To toggle the popup visibility
+  const [popupMessage, setPopupMessage] = useState(""); 
+  const [showPopup, setShowPopup] = useState(false); 
 
   const [userData, setUserData] = useState({
     givenName: "",
@@ -36,7 +36,7 @@ const Statistics: React.FC = () => {
     streak: "",
   });
 
-  const [showUpperTabs, setShowUpperTabs] = useState<boolean>(true); // State to control upper tabs visibility
+  const [showUpperTabs, setShowUpperTabs] = useState<boolean>(true);
 
   const fetchGroupLeaderboard = async () => {
     try {
@@ -144,10 +144,7 @@ const Statistics: React.FC = () => {
     fetchGoal();
   }, []);
 
-  const progressPercentage = Math.min(
-    (userHours / personalGoal) * 100,
-    100 // Cap at 100%
-  );
+  const progressPercentage = Math.min((userHours / personalGoal) * 100, 100);
 
   return (
     <Container className="p-6 d-flex justify-content-center">
@@ -177,7 +174,7 @@ const Statistics: React.FC = () => {
             className="text-center justify-content-center mb-2"
             onSelect={(key) => {
               if (key === "leaderboards") {
-                setShowUpperTabs(false); // Hide upper tabs if "Leaderboards" is selected
+                setShowUpperTabs(false); 
               }
             }}
           >
@@ -225,7 +222,6 @@ const Statistics: React.FC = () => {
                   )}
                 </div>
 
-                {/* Progress Bar */}
                 <div className="w-3/4 mx-auto">
                   <ProgressBar
                     now={progressPercentage}
@@ -283,7 +279,11 @@ const Statistics: React.FC = () => {
                       }}
                       onClick={() => {
                         setPopupMessage(
-                          `You earn this badge for completing ${milestone} hours!`
+                          userHours >= milestone
+                            ? `You earned this badge for completing ${milestone} hours! 🎉`
+                            : `Keep going! You need ${(
+                                milestone - userHours
+                              ).toFixed(1)} more hours to unlock this badge. 💪`
                         );
                         setShowPopup(true);
                       }}
@@ -312,13 +312,12 @@ const Statistics: React.FC = () => {
           </Tabs>
         ) : (
           <div>
-            {/* Back to Upper Tabs Button */}
             <div className="d-flex justify-content-center">
               <Button
                 variant="link"
                 className="mb-2 text-blue-500 text-center"
                 onClick={() => setShowUpperTabs(true)}
-                style={{ marginLeft: "-30%" }} // Slightly align the button to the left
+                style={{ marginLeft: "-30%" }}
               >
                 ← Leaderboards
               </Button>

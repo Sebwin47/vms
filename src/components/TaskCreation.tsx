@@ -13,6 +13,11 @@ const TaskCreation: React.FC = () => {
   const [skillSuggestions, setSkillSuggestions] = useState<string[]>([]);
   const [enteredSkills, setEnteredSkills] = useState<string[]>([]);
   const [skillsInput, setSkillsInput] = useState<string>("");
+  const [categoryInput, setCategoryInput] = useState<string>("");
+  const [categorySuggestions, setCategorySuggestions] = useState<
+    TaskCategory[]
+  >([]);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -88,12 +93,32 @@ const TaskCreation: React.FC = () => {
         tolerance: 0,
         categoryId: "",
       });
-      setEnteredSkills([]); // Skills zurücksetzen
+      setEnteredSkills([]);
       setError("");
     } catch (err) {
       console.error("Error creating task:", err);
       setError("Failed to create task");
     }
+  };
+
+  const handleCategoryInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCategoryInput(value);
+
+    if (value) {
+      const filtered = categories.filter((category) =>
+        category.name.toLowerCase().includes(value.toLowerCase())
+      );
+      setCategorySuggestions(filtered);
+    } else {
+      setCategorySuggestions([]);
+    }
+  };
+
+  const handleCategorySelect = (category: TaskCategory) => {
+    setFormData({ ...formData, categoryId: category.id.toString() });
+    setCategoryInput(category.name);
+    setCategorySuggestions([]);
   };
 
   const handleSkillsInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,6 +180,32 @@ const TaskCreation: React.FC = () => {
               }
               required
             />
+          </div>
+
+          <div className="form-group position-relative">
+            <label>Category</label>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search category..."
+              value={categoryInput}
+              onChange={handleCategoryInput}
+              required
+            />
+
+            {categorySuggestions.length > 0 && (
+              <div className="suggestion-list">
+                {categorySuggestions.map((category) => (
+                  <div
+                    key={category.id}
+                    className="suggestion-item"
+                    onClick={() => handleCategorySelect(category)}
+                  >
+                    {category.name}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="form-group">
@@ -280,25 +331,6 @@ const TaskCreation: React.FC = () => {
                 setFormData({ ...formData, remarks: e.target.value })
               }
             />
-          </div>
-
-          <div className="form-group">
-            <label>Category</label>
-            <select
-              className="form-control"
-              value={formData.categoryId}
-              onChange={(e) =>
-                setFormData({ ...formData, categoryId: e.target.value })
-              }
-              required
-            >
-              <option value="">Select Category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div className="form-group position-relative">

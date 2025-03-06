@@ -46,8 +46,8 @@ body {
     ),
     linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593);
   background-size: 1rem 1rem, 100% 100%;
-  animation: stripeAnimation 1s linear infinite; /* Für das Streifen-Scrolling */
-  transition: width 0.5s ease-in-out; /* Für eine sanfte Fortschrittsanimation */
+  animation: stripeAnimation 1s linear infinite; 
+  transition: width 0.5s ease-in-out; 
 }
 
 @keyframes stripeAnimation {
@@ -243,10 +243,10 @@ html, body {
 .skill-chip.broader { background-color: #ffc107; color: #000; }
 
 
-.btn.exact { background-color: #28a745; color: #fff; }
-.btn.group { background-color: #c93f3f; color : #fff; }
-.btn.narrower { background-color: #9056fb; color : #fff; }
-.btn.broader { background-color: #ffc107; color: #000000; }
+.btn.exact { background-color: #28a745; color: #fff; } /*Green*/
+.btn.group { background-color: #c93f3f; color : #fff; } /*Red*/
+.btn.narrower { background-color: #9056fb; color : #fff; } /*Purple*/
+.btn.broader { background-color: #ffc107; color: #000000; } /*Yellow with black text*/
 
 .thick-divider {
   border-top: 2px solid rgba(0, 0, 0, 0.2) !important;

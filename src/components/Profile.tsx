@@ -53,7 +53,6 @@ function Profile() {
       };
 
       setFormData(profileData);
-      // Initialize enteredLocalities with fetched data
       setEnteredLocalities(profileData.locationAvailability || []);
     } catch (err: any) {
       setError(

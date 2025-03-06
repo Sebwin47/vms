@@ -84,7 +84,6 @@ const Admin: React.FC = () => {
       <div className="w-75 mb-4">
         <h1 className="text-2xl font-bold mb-4 text-center">Admin Panel</h1>
 
-        {/* Tab Navigation */}
         <div className="nav nav-tabs mb-4 justify-content-center">
           <button
             className={`nav-link ${activeTab === "find" ? "active" : ""}`}
@@ -261,7 +260,6 @@ const Admin: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Available Volunteers */}
                         <h4 className="mt-4">Available Volunteers:</h4>
                         <ul className="list-group">
                           {result.volunteers.map((volunteer: any) => (
@@ -308,7 +306,6 @@ const Admin: React.FC = () => {
                                     {expandedVolunteers.has(
                                       `${result.taskId}-${volunteer.id}`
                                     ) &&
-                                      // Deduplizierung der Skills
                                       Array.from(
                                         new Map(
                                           volunteer.matchedSkills.map(
@@ -317,7 +314,7 @@ const Admin: React.FC = () => {
                                         ).values()
                                       ).map((skill: any) => (
                                         <div
-                                          key={`${volunteer.id}-${skill.skill}`} // Key ohne Task-ID
+                                          key={`${volunteer.id}-${skill.skill}`}
                                           className={`skill-chip ${skill.type}`}
                                         >
                                           {skill.skill}
@@ -360,7 +357,6 @@ const Admin: React.FC = () => {
                 )}
               </div>
 
-              {/* Volunteer Popup */}
               {showVolunteerPopup && selectedVolunteer && (
                 <div className="popup-overlay">
                   <div className="popup-content wide-popup">
