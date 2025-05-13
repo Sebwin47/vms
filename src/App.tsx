@@ -19,6 +19,7 @@ import Admin from "./components/Admin";
 import { jwtDecode } from "jwt-decode";
 import Statistics from "./components/Stats";
 import CheckInOut from "./components/CheckInOut";
+import GraphExplorer from "./components/GraphExplorer";
 
 function getAuthInfo() {
   const token = localStorage.getItem("authToken");
@@ -114,6 +115,15 @@ function App() {
           }
         />
 
+        <Route
+          path="/explore"
+          element={
+            <PrivateRoute requiredRole="volunteer">
+              <PageLayout content={<GraphExplorer />} />
+            </PrivateRoute>
+          }
+        />
+
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
@@ -192,6 +202,9 @@ function ProfileDropdown() {
             </Dropdown.Item>
             <Dropdown.Item onClick={() => navigate("/checkinout")}>
               Check In/Out
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => navigate("/explore")}>
+              Graph Explorer
             </Dropdown.Item>
           </>
         )}
