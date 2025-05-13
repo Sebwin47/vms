@@ -1,12 +1,11 @@
 // src/components/Graph.js
 import { useEffect, useState } from "react";
 import cytoscape from "cytoscape";
-import API_BASE_URL from "./config"; // Adjust the import based on your project structure
+import API_BASE_URL from "./config";
 
 const Graph = () => {
   const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
 
-  // Color map based on the type value
   const typeColorMap = {
     volunteer: "#F16667",
     skill: "#8DCC93",
@@ -20,8 +19,7 @@ const Graph = () => {
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
-        const apiBaseUrl = API_BASE_URL;
-        const response = await fetch(`${apiBaseUrl}/graph2`);
+        const response = await fetch(`${API_BASE_URL}/graph`);
         const data = await response.json();
         setGraphData(data);
       } catch (error) {
@@ -36,62 +34,111 @@ const Graph = () => {
     if (graphData.nodes.length > 0) {
       const cy = cytoscape({
         container: document.getElementById("cy"),
-
         elements: {
           nodes: graphData.nodes.map((node) => ({
-            data: { id: node.id, label: node.label, type: node.type },
+            data: {
+              id: node.id,
+              label: node.label,
+              type: node.type.toLowerCase(),
+            },
           })),
           edges: graphData.edges.map((edge) => ({
-            data: { source: edge.from, target: edge.to, type: edge.type },
+            data: {
+              source: edge.from,
+              target: edge.to,
+              type: edge.type,
+            },
           })),
         },
-
         style: [
           {
             selector: "node",
             style: {
-              content: "data(label)",
-              color: "#000000", // Text color set to black
+              width: 100,
+              height: 100,
               label: "data(label)",
-              "font-size": "12px",
-              "text-halign": "center", // center-align the text horizontally
-              "text-valign": "center", // center-align the text vertically
-              // Set node background color based on the type
-              "background-color": (node) => {
-                const type = node.data("type");
-                return typeColorMap[type] || "#AAAAAA"; // Default to grey if type is not in map
-              },
+              "text-valign": "center",
+              "text-halign": "center",
+              "font-size": "16px",
+              color: "#000",
+              "background-color": (ele) =>
+                typeColorMap[ele.data("type")] || "#AAA",
+              "border-width": 2,
+              "border-color": "#333",
+              "text-outline-width": 2,
+              "text-outline-color": "#fff",
             },
           },
+
           {
             selector: "edge",
             style: {
               width: 2,
-              "line-color": "#cccccc",
-              "target-arrow-color": "#cccccc",
+              "line-color": "#999",
+              "target-arrow-color": "#999",
               "target-arrow-shape": "triangle",
               label: "data(type)",
               "font-size": "8px",
+              "text-rotation": "autorotate",
+              "curve-style": "bezier",
+              "arrow-scale": 1.5,
             },
           },
         ],
-
         layout: {
-          name: "circle",
+          name: "cose",
+          animate: true,
+          padding: 30,
+          nodeRepulsion: 80000,
+          idealEdgeLength: 100,
+          edgeElasticity: 100,
         },
       });
 
-      cy.zoom(1);
-      cy.pan({ x: 50, y: 50 });
+      // Hover highlight
+      cy.on("mouseover", "node", (event) => {
+        const node = event.target;
+        node.animate({
+          style: { "background-color": "#0d00ff" },
+        });
+
+        node.connectedEdges().animate({ style: { "line-color": "#00E5FF" } });
+        node
+          .connectedEdges()
+          .connectedNodes()
+          .not(node)
+          .animate({ style: { "background-color": "#29bfff" } });
+      });
+
+      cy.on("mouseout", "node", () => {
+        cy.elements().removeStyle();
+      });
+
+      // Zoom to node on click
+      cy.on("tap", "node", (event) => {
+        const node = event.target;
+        cy.animate({
+          fit: {
+            eles: node.closedNeighborhood(),
+            padding: 40,
+          },
+          duration: 500,
+        });
+      });
     }
   }, [graphData]);
 
   return (
     <div>
-      <h2>Graph Visualization for Task</h2>
+      <h2>Graph Visualization</h2>
       <div
         id="cy"
-        style={{ width: "100%", height: "500px", border: "1px solid #ccc" }}
+        style={{
+          width: "100%",
+          height: "600px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+        }}
       ></div>
     </div>
   );
