@@ -1,10 +1,21 @@
-// src/components/Graph.js
 import { useEffect, useState } from "react";
 import cytoscape from "cytoscape";
 import API_BASE_URL from "./config";
 
+type NodeType = {
+  id: string;
+  label: string;
+  type: string;
+};
+
+type EdgeType = {
+  from: string;
+  to: string;
+  type: string;
+};
+
 const Graph = () => {
-  const [graphData, setGraphData] = useState({ nodes: [], edges: [] });
+  const [graphData, setGraphData] = useState<{ nodes: NodeType[]; edges: EdgeType[] }>({ nodes: [], edges: [] });
 
   const typeColorMap = {
     volunteer: "#F16667",
@@ -61,8 +72,8 @@ const Graph = () => {
               "text-halign": "center",
               "font-size": "16px",
               color: "#000",
-              "background-color": (ele) =>
-                typeColorMap[ele.data("type")] || "#AAA",
+              "background-color": (ele: cytoscape.NodeSingular) =>
+                typeColorMap[ele.data("type") as keyof typeof typeColorMap] || "#AAA",
               "border-width": 2,
               "border-color": "#333",
               "text-outline-width": 2,
@@ -89,9 +100,9 @@ const Graph = () => {
           name: "cose",
           animate: true,
           padding: 30,
-          nodeRepulsion: 80000,
-          idealEdgeLength: 100,
-          edgeElasticity: 100,
+          nodeRepulsion: () => 80000,
+          idealEdgeLength: () => 100,
+          edgeElasticity: () => 100,
         },
       });
 
