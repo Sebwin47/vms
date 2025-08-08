@@ -16,14 +16,14 @@ import {
 const Statistics: React.FC = () => {
   const [userHours, setUserHours] = useState<number>(0);
   const [personalGoal, setPersonalGoal] = useState<number>(30); // Default goal
-  const [isEditingGoal, setIsEditingGoal] = useState(false); 
+  const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [groupLeaderboard, setGroupLeaderboard] = useState<any[]>([]);
   const [volunteerLeaderboard, setVolunteerLeaderboard] = useState<any[]>([]);
   const [streakLeaderboard, setStreakLeaderboard] = useState<any[]>([]);
   const [loadingGroups, setLoadingGroups] = useState<boolean>(true);
   const [loadingVolunteers, setLoadingVolunteers] = useState<boolean>(true);
-  const [popupMessage, setPopupMessage] = useState(""); 
-  const [showPopup, setShowPopup] = useState(false); 
+  const [popupMessage, setPopupMessage] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
 
   const [userData, setUserData] = useState({
     givenName: "",
@@ -174,7 +174,7 @@ const Statistics: React.FC = () => {
             className="text-center justify-content-center mb-2"
             onSelect={(key) => {
               if (key === "leaderboards") {
-                setShowUpperTabs(false); 
+                setShowUpperTabs(false);
               }
             }}
           >
